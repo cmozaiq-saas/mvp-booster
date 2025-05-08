@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+# Define the root of your application (the directory where the script lives)
+APP_ROOT = File.expand_path("..", __dir__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args.join(" ")} failed ==")
+end
+
+FileUtils.chdir(APP_ROOT) do
+  unless ARGV.size == 1
+    abort "Please provide a new name for your app, e.g.: bin/my_template new_app_name"
+  end
+
+  new_app_name = ARGV[0]
+  puts "== Installing Bundler =="
+  system! "gem install bundler --conservative"
+  system("bundle check") || system!("bundle install")
+
+  # Delete existing credentials before renaming
+  puts "== Removing existing credentials =="
+  system! "rm -f config/credentials.yml.enc config/master.key" if File.exist?("config/credentials.yml.enc")
+  
+  puts "== Generating Rails Credentials =="
+  system! 'VISUAL="code --wait" rails credentials:edit'
+  
+  puts "== Renaming the Application =="
+  # This assumes you have a custom generator (rename:into) defined
+  system! "rails g rename:into #{new_app_name}"
+
+  # Optionally change directory to the new app folder if needed:
+  # system! "cd ../#{new_app_name}"
+  
+  puts "== Setting up the application =="
+  system! "bin/rails db:prepare"
+
+  puts "== Removing Old License =="
+  system! "rm -f LICENSE" if File.exist?("LICENSE")
+
+  puts "== Initializing a New Git Repository =="
+  system! "rm -rf .git && git init && git add . && git commit -m 'Initial commit from template'"
+
+
+  puts "== Your new app is ready! =="
+end
