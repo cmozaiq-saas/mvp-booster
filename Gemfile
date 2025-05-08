@@ -81,3 +81,5 @@ gem "pagy"
 gem "ransack"
 # Spreadsheet Architect is a library that allows you to create XLSX, ODS, or CSV spreadsheets super easily [https://github.com/westonganger/spreadsheet_architect]
 gem "spreadsheet_architect"
+
+gem "mission_control-jobs"
