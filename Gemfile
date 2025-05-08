@@ -20,7 +20,7 @@ gem "tailwindcss-rails"
 gem "jbuilder"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -74,3 +74,9 @@ gem "letter_opener"
 
 # Admin Layout setup via administratio-zero
 gem "administration-zero", "~> 1.0"
+# Use Pagy to add paginated results [https://github.com/ddnexus/pagy]
+gem "pagy"
+# Use Ransack to enable the creation of search forms for your application [https://github.com/activerecord-hackery/ransack]
+gem "ransack"
+# Spreadsheet Architect is a library that allows you to create XLSX, ODS, or CSV spreadsheets super easily [https://github.com/westonganger/spreadsheet_architect]
+gem "spreadsheet_architect"

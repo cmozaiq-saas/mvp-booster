@@ -1,0 +1,19 @@
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta24/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@rails/ujs@7.1.3-4/app/assets/javascripts/rails-ujs.min.js"></script>
+
+<!-- Stimulus -->
+<script type="module">
+  import { Application, Controller } from "https://cdn.jsdelivr.net/npm/@hotwired/stimulus@3.2.2/+esm"
+  window.Stimulus = Application.start()
+
+  Stimulus.register("flash-message", class extends Controller {
+    connect() { new bootstrap.Toast(this.element).show() }
+  })
+</script>
+
+<!-- Time zone -->
+<script type="module">
+  import jsCookie from "https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/+esm"
+  const { timeZone } = new Intl.DateTimeFormat().resolvedOptions()
+  jsCookie.set("time_zone", timeZone, { expires: 365 })
+</script>
