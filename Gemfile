@@ -26,6 +26,7 @@ gem "jbuilder"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+gem "sqlite3"
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
@@ -56,6 +57,7 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem "erb_lint", require: false
 end
 
 group :test do
@@ -63,3 +65,12 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+
+gem "devise"
+gem "rename"
+gem "rails_icons"
+gem "letter_opener"
+
+# Admin Layout setup via administratio-zero
+gem "administration-zero", "~> 1.0"
