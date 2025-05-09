@@ -3,12 +3,14 @@ require "fileutils"
 
 # Define the root of your application (the directory where the script lives)
 APP_ROOT = File.expand_path("..", __dir__)
+# Get the basename of the original application directory
+ORIGINAL_APP_BASENAME = File.basename(APP_ROOT)
 
 def system!(*args)
   system(*args) || abort("\n== Command #{args.join(" ")} failed ==")
 end
 
-FileUtils.chdir(APP_ROOT) do
+FileUtils.chdir(APP_ROOT) do # CWD is now the original app root
   unless ARGV.size == 1
     abort "Please provide a new name for your app, e.g.: bin/my_template new_app_name"
   end
@@ -21,26 +23,58 @@ FileUtils.chdir(APP_ROOT) do
   # Delete existing credentials before renaming
   puts "== Removing existing credentials =="
   system! "rm -f config/credentials.yml.enc config/master.key" if File.exist?("config/credentials.yml.enc")
-  
+
   puts "== Generating Rails Credentials =="
   system! 'VISUAL="code --wait" rails credentials:edit'
-  
+
   puts "== Renaming the Application =="
   # This assumes you have a custom generator (rename:into) defined
   system! "rails g rename:into #{new_app_name}"
+  # At this point, the CWD of this script should have been updated by the OS
+  # to the new directory name. APP_ROOT variable is now stale.
+
+  puts "== Removing rename gem from Gemfile =="
+  gemfile_path = "Gemfile" # Use relative path, CWD is the new app root
+  if File.exist?(gemfile_path)
+    gemfile_content = File.read(gemfile_path)
+    # Remove the line containing 'gem "rename"' or 'gem \'rename\''
+    # This regex handles different quoting and potential comments on the same line
+    new_gemfile_content = gemfile_content.gsub(/^.*gem .*["']rename["'].*\n/, "")
+    File.write(gemfile_path, new_gemfile_content)
+    puts "== Bundling dependencies after removing rename gem =="
+    system! "bundle install" # Runs in the new app root CWD
+  else
+    puts "Warning: Gemfile not found at #{File.expand_path(gemfile_path)}. Skipping rename gem removal."
+  end
+
+  puts "== Updating application name in deploy.yml =="
+  # Use the original app basename for replacement
+  # new_app_name is in a format suitable for deploy.yml (e.g., kebab-case)
+  deploy_file_path = "config/deploy.yml" # Use relative path
+
+  if File.exist?(deploy_file_path)
+    deploy_content = File.read(deploy_file_path)
+    # Replace ORIGINAL_APP_BASENAME with new_app_name
+    new_deploy_content = deploy_content.gsub(ORIGINAL_APP_BASENAME, new_app_name)
+    File.write(deploy_file_path, new_deploy_content)
+    puts "Successfully updated #{File.expand_path(deploy_file_path)} with new app name: #{new_app_name}"
+  else
+    puts "Warning: deploy.yml not found at #{File.expand_path(deploy_file_path)}. Skipping update."
+  end
 
   # Optionally change directory to the new app folder if needed:
-  # system! "cd ../#{new_app_name}"
-  
+  # FileUtils.chdir(File.join(File.dirname(APP_ROOT), new_app_name)) # Explicit chdir if needed, but CWD should be correct
+  # system! "cd ../#{new_app_name}" # This was a shell command, not for Ruby's CWD
+
+  system! "cd ../#{new_app_name}"
   puts "== Setting up the application =="
-  system! "bin/rails db:prepare"
+  system! "bin/rails db:prepare" # Runs in the new app root CWD
 
   puts "== Removing Old License =="
-  system! "rm -f LICENSE" if File.exist?("LICENSE")
+  system! "rm -f LICENSE" if File.exist?("LICENSE") # Relative path
 
   puts "== Initializing a New Git Repository =="
-  system! "rm -rf .git && git init && git add . && git commit -m 'Initial commit from template'"
-
+  system! "rm -rf .git && git init && git add . && git commit -m 'Initial commit from template'" # Runs in new app root CWD
 
   puts "== Your new app is ready! =="
 end
