@@ -19,11 +19,11 @@ FileUtils.chdir(APP_ROOT) do
   system("bundle check") || system!("bundle install")
 
   # Delete existing credentials before renaming
-  puts "== Removing existing credentials =="
-  system! "rm -f config/credentials.yml.enc config/master.key" if File.exist?("config/credentials.yml.enc")
+  # puts "== Removing existing credentials =="
+  # system! "rm -f config/credentials.yml.enc config/master.key" if File.exist?("config/credentials.yml.enc")
 
-  puts "== Generating Rails Credentials =="
-  system! 'VISUAL="code --wait" rails credentials:edit'
+  #puts "== Generating Rails Credentials =="
+  #system! 'VISUAL="code --wait" rails credentials:edit'
 
   puts "== Renaming the Application =="
   # This assumes you have a custom generator (rename:into) defined
