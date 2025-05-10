@@ -30,7 +30,7 @@ FileUtils.chdir(APP_ROOT) do
   system! "rails g rename:into #{new_app_name}"
 
   # Optionally change directory to the new app folder if needed:
-  system! "cd ../#{new_app_name}"
+  # system! "cd ../#{new_app_name}"
 
   puts "== Setting up the application =="
   system! "bin/rails db:prepare"
